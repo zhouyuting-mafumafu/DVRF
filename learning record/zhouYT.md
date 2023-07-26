@@ -1,6 +1,4 @@
 
-
-
 ### 工作内容简介
 
 本次小学期我主要负责的部分是进行web漏洞题目设计，主要工作内容涉及了第一题获得登陆密码以及第二题xss的题目设置，包括buildit，breakit以及fixit。涉及这部分的代码文件由汪睿同学一起提交。
@@ -89,7 +87,7 @@ if not sid then
 
 * 由于密码未知，目的是希望用户通过随意输入密码提交，同时后台进行抓包，用户从报文中获得提示，依据提示解题。
 
-#### 题目一 解题过程(具体见[Login](https://github.com/zhouyuting-mafumafu/DVRF/blob/main/Login/%E7%99%BB%E5%BD%95.md))
+#### 题目一 解题过程(具体见[Login](https://github.com/zhouyuting-mafumafu/DVRF/tree/record/Login))
 
 * 随意输入密码，burpsuite抓包获得提示
 
@@ -107,7 +105,7 @@ if not sid then
 
 * 防止密码被轻易爆破，建议是使用位数更多，且更加复杂的密码，并且使用sha256加密。
 
-#### 题目二 fix it(writeup见[XSS](https://github.com/zhouyuting-mafumafu/DVRF/blob/main/XSS/XSS.md))
+#### 题目二 fix it(writeup见[XSS](https://github.com/zhouyuting-mafumafu/DVRF/tree/record/XSS))
 
 * vim usr/model/cbi/firewall/forward-details.lua
 ```lua
@@ -715,6 +713,8 @@ sed -i 's_downloads.openwrt.org_mirrors.tuna.tsinghua.edu.cn/openwrt_' /etc/opkg
 ### 学习记录更新地址
 
 学习commit记录在仓库：[zhouyuting（已失效）](https://github.com/zhouyuting-mafumafu/DVRF/blob/main/%E7%8C%AA%E8%B9%84learningrecord.md)
+
+[zhouyuting](https://github.com/zhouyuting-mafumafu/DVRF/tree/record/learning%20record)
 
 ❗❗❗由于本人操作失误，学习记录最初记录在了上游仓库所fork的本人的主分支里，但是由于最后主仓库更新了，没有看清楚就直接Sync fork了之后，导致原来更新的记录都找不回来了，因为最初没有克隆到本地，就无法从本地的.git文件记录里找回。😫😫😭
 但是可以从以下几张图片看出来确实是曾经存在过的，也多次commit至由于本人写报告有每次写完保存到本地还不够，喜欢发送到微信文件传输助手来确保文件“万无一失”，卑微证明一下：
