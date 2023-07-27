@@ -16,6 +16,42 @@
 * 整体设计以及解题思路
 
     * 用户访问固件登陆界面，密码未知。通过输入任意值，利用burpsuite截获报文，可在请求头中得到一串提示（前缀cuc经过md5加密）：`totallengthis6,f1f4e30acef64bd0d346b050e73289e7`，攻击者后续通过对`f1f4e30acef64bd0d346b050e73289e7`进行MD5解密得到前缀`cuc`，由提示可知是六位密码，随后对后三位利用密码本进行爆破，获得最终密码`cuc123`，成功登录路由器后台。成功登陆后截获的报文中出现flag。
+    * python 解密md5脚本
+
+```python
+import hashlib
+import datetime
+#import sys
+def Findmd5(args):
+    md=args.hashvalue
+    starttime=datetime.datetime.now()
+    for i in open(args.file):
+        md5=hashlib.md5()   #获取一个md5加密算法对象
+        rs=i.strip()    #去掉行尾的换行符
+        md5.update(rs.encode('utf-8'))  #指定需要加密的字符串
+        newmd5=md5.hexdigest()  #获取加密后的16进制字符串
+        #print newmd5
+        if newmd5==md:
+            print '明文是：'+rs    #打印出明文字符串
+            break
+        else:
+            pass
+
+    endtime=datetime.datetime.now()
+    print endtime-starttime	#计算用时，非必须
+
+if __name__=='__main__':
+    import argparse #命令行参数获取模块
+    parser=argparse.ArgumentParser(usage='Usage:./findmd5.py -l 密码文件路径 -i 哈希值 ',description='help info.')   #创建一个新的解析对象
+    parser.add_argument("-l", default='wordlist.txt', help="密码文件.", dest="file")    #向该对象中添加使用到的命令行选项和参数
+    parser.add_argument("-i", dest="hashvalue",help="要解密的哈希值.")
+
+    args = parser.parse_args()  #解析命令行
+    Findmd5(args)
+
+##-l：密码表文件
+##-i：MD5值
+```
 
 * `vim /usr/lib/lua/luci/dispatcher.lua`找到以下位置修改,在报文请求头中添加提示：
 
@@ -59,7 +95,9 @@ if not sid then
 
 * 整体设计思路
 
-    * 攻击者在成功登陆之后需要找到xss攻击点，绕过我们设置的限制，(通过过滤尖括号)，才能获得提示信息。同时设计了base32编码等“别出心裁”的，不同于直接进行base64编码的方式“为难”攻击者。在设计时，为了防止攻击者直接查看源码得到提示信息，我们将提示信息写入了一个js文件(showMessage.js)，以获得下一题“命令注入”的相关提示。
+    * 攻击者在成功登陆之后需要找到xss攻击点，绕过我们设置的限制，(通过过滤尖括号)，才能获得提示信息。
+    
+    * 攻击者通过查看页面源码，寻找提示，在设计时，为了防止攻击者直接查看源码得到结果，我们将下一题信息写入了一个js文件(showMessage.js)，但是会给出提示信息来提示攻击者利用`showMessage`进行xss攻击尝试。
 
     * 利用导航栏`firewall port-forward` 的 `name` 字段构造 xss，将答案放在`showMessage.js`的函数里，执行这个函数会弹窗给出提示信息
 
@@ -107,7 +145,7 @@ if not sid then
 
 #### 题目二 fix it(writeup见[XSS](https://github.com/zhouyuting-mafumafu/DVRF/tree/record/XSS))
 
-* vim usr/model/cbi/firewall/forward-details.lua
+* `vim usr/model/cbi/firewall/forward-details.lua`
 ```lua
 if not name or #name == 0 then
 		name = translate("(Unnamed Entry)")
@@ -119,7 +157,7 @@ end
 s = m:section(NamedSection, arg[1], "redirect", "")
 ```
 
-* vim usr/model/cbi/firewall/rule-details.lua
+* `vim usr/model/cbi/firewall/rule-details.lua`
 
 ```lua
 		name = "SNAT %s" % name
@@ -744,8 +782,12 @@ sed -i 's_downloads.openwrt.org_mirrors.tuna.tsinghua.edu.cn/openwrt_' /etc/opkg
 
 [XSS](https://cloud.tencent.com/developer/article/1573003)
 
+[md5](https://blog.csdn.net/weixin_43853965/article/details/103756110)
+
 [XSS 过滤绕过备忘单](https://wizardforcel.gitbooks.io/owasp-cheat-sheet-zh/content/xss-filter-evasion-cheat-sheet.html)
 
 [XSS ctf 题目](https://juejin.cn/s/ctf%20xss%20%E9%A2%98%E7%9B%AE)
 
 [burpsuite](https://blog.csdn.net/guo15890025019/article/details/106297296)
+
+ChatGPT
