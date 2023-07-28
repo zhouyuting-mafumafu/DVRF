@@ -8,10 +8,10 @@ DVRF 的全称是 Danm Vulnerable Router Firmware，该项目是一个基于 [Op
 | DVRF | 描述 |
 | :--- | :--- |
 | L1 Brute Login |  |
-| L2 Damn XSS |(CVE-2019-18993) |
+| L2 Damn XSS |  |
 | L3 What‘s your bandwidth? | (CVE-2019-12272) |
-| L4 Untar | 
-| L5 Easy serialize 
+| L4 Untar |  |
+| L5 Easy serialize |  |
 | L6 Try Opkg | (CVE-2020-7982) |
 | L7 Baby & Big Pwn | (CVE-2018-1160) |
 
@@ -35,9 +35,9 @@ DVRF 的全称是 Danm Vulnerable Router Firmware，该项目是一个基于 [Op
 
 本题改编自第十六届全国大学生信息安全创新实践能力赛-华北赛区赛题 ez_date 旨在让用户了解有关**反序列化的漏洞利用**。该题目会为用户提供反序列化函数源码及相关会用到函数源码，用户根据源码了解反序列化函数的运行逻辑，自行构造序列化值发送到相应接口获取 flag。在反序列化函数中有有关 md5 值的比较，需要攻击者可以绕开 md5 值比较，使得两个变量值不同但 md5 值相同；除此之外还需要绕过一些过滤规则。
 
-### 个人工作内容简介
+## 工作内容简介
 
-本次小学期我主要负责的部分是进行web漏洞题目设计，主要工作内容涉及了第一题**获得登陆密码**以及第二题**xss**的题目设置，包括buildit，breakit以及fixit的相关内容。涉及这部分的代码文件由汪睿同学一起提交。
+本次小学期我主要负责的部分是进行web漏洞题目设计，主要工作内容涉及了第一题获得登陆密码以及第二题xss的题目设置，包括buildit，breakit以及fixit。涉及这部分的代码文件由汪睿同学一起提交。
 
 在为期20天的学习中，我不仅学习了更多漏洞类型，更加深入地了解了跨站脚本漏洞，注入漏洞，暴力破解，csrf攻击等等。也利用openwrt源码，修改内容尝试自己编译个性化的固件，学习了lua语言，在后期的web漏洞题型的设计中修改代码，设计题目等方面起到了重要的作用。
 
@@ -45,9 +45,9 @@ DVRF 的全称是 Danm Vulnerable Router Firmware，该项目是一个基于 [Op
 
 总体来说，本次小学期我的工作内容不多，但是过程中每天都在跟着小组一起学习不同的知识，它们有的被应用在了最终成果中，而有的对我未来的学习或许是一种积累。整个过程中，组员们都积极交流，互相督促互相请教，基本每两三天就会开一次组会交流工作进度，分享遇到的问题，共同解决，这也让我体会到了团队的意义。
 
-#### web漏洞设计
+### web漏洞设计
 
-**获得登录密码**
+#### 获得登录密码
 
 * 整体设计以及解题思路
 
@@ -175,7 +175,7 @@ if __name__== "__main__":
     main()
 ```
 
-**xss**
+#### xss
 
 * 整体设计思路
 
@@ -340,9 +340,9 @@ if __name__== "__main__":
     main()
 ```
 
-### 学习笔记
+## 学习笔记
 
-#### 编译OpenWrt定制属于自己的固件
+### 编译OpenWrt定制属于自己的固件
 
 * 实验环境
 
@@ -552,7 +552,7 @@ make menuconfig
 make V=s -j$(nproc)
 ```
 
-#### LUA语法学习
+### LUA语法学习
 
 * 区分大小写
 
@@ -750,7 +750,7 @@ end
 
         * `collectgarbage("stop")`: 停止垃圾收集器的运行。 在调用重启前，收集器只会因显式的调用运行。
 
-#### 网络配置
+### 网络配置
 
 完成以下配置，在浏览器输入ip:`192.168.23.15`登录固件及下载相关软件包
 
@@ -762,7 +762,7 @@ end
 
     * 修改`nameserver`为`8.8.8.8`
 
-#### ftp远程连接
+### ftp远程连接
 
 ftp远程连接虚拟机方便修改相关文件
 
@@ -791,7 +791,7 @@ ftp远程连接虚拟机方便修改相关文件
 
 * `shift+ctrl+p`搜索`remote directory open to workspace`，然后在其中选择文件夹传输即可。
 
-#### 修改banner
+### 修改banner
 
 `etc/banner`
 修改个性化banner
@@ -809,7 +809,7 @@ Developed by students from Communication University of China
 -----------------------------------------------------
 ```
 
-#### 添加子页或导航栏
+### 添加子页或导航栏
 
 **添加子页**
 
@@ -861,7 +861,7 @@ end
 
 `rm –fr /tmp/luci-*`
 
-#### MVC
+### MVC
 
 * **view** – 模板系统Template，控制前端显示效果,类似 C语言开发 CGI 的 flate 库，java 的 jsp 技术
     
@@ -895,7 +895,7 @@ end
 
 
 
-#### 问题
+## 问题
 
 * `opkg update&&opkg install vsftpd`遇到
 
@@ -919,11 +919,11 @@ Collected errors:
 sed -i 's_downloads.openwrt.org_mirrors.tuna.tsinghua.edu.cn/openwrt_' /etc/opkg/distfeeds.conf
 ```
 
-### 学习记录更新地址
+## 学习记录更新地址
 
 学习commit记录在仓库：[zhouyuting（已失效）](https://github.com/zhouyuting-mafumafu/DVRF/blob/main/%E7%8C%AA%E8%B9%84learningrecord.md)
 
-[zhouyuting](https://github.com/zhouyuting-mafumafu/DVRF/tree/record/learning%20record)
+[zhouyuting(有效)](https://github.com/zhouyuting-mafumafu/DVRF/tree/record/learning%20record)
 
 ❗❗❗由于本人操作失误，学习记录最初记录在了上游仓库所fork的本人的主分支里，但是由于最后主仓库更新了，没有看清楚就直接Sync fork了之后，导致原来更新的记录都找不回来了，因为最初没有克隆到本地，就无法从本地的.git文件记录里找回。😫😫😭
 但是可以从以下几张图片看出来确实是曾经存在过的，也多次commit至由于本人写报告有每次写完保存到本地还不够，喜欢发送到微信文件传输助手来确保文件“万无一失”，卑微证明一下：
@@ -931,6 +931,8 @@ sed -i 's_downloads.openwrt.org_mirrors.tuna.tsinghua.edu.cn/openwrt_' /etc/opkg
 ![](img/1.png)
 
 ![](img/2.png)
+
+以上两张是仓库还没被刷新的时候截下来的，猪蹄learningrecord就是曾经上传的学习记录。
 
 ![](img/3.png)
 
@@ -940,7 +942,7 @@ sed -i 's_downloads.openwrt.org_mirrors.tuna.tsinghua.edu.cn/openwrt_' /etc/opkg
 
 ![](img/6.png)
 
-### 参考文献
+## 参考文献
 [清华大学opkg release镜像源](https://mirror.tuna.tsinghua.edu.cn/help/openwrt/)
 
 [opkg update报错解决方法](https://blog.csdn.net/weixin_39510813/article/details/78564307)
@@ -953,9 +955,9 @@ sed -i 's_downloads.openwrt.org_mirrors.tuna.tsinghua.edu.cn/openwrt_' /etc/opkg
 
 [XSS](https://cloud.tencent.com/developer/article/1573003)
 
-[md5](https://blog.csdn.net/weixin_43853965/article/details/103756110)
-
 [XSS 过滤绕过备忘单](https://wizardforcel.gitbooks.io/owasp-cheat-sheet-zh/content/xss-filter-evasion-cheat-sheet.html)
+
+[md5](https://blog.csdn.net/weixin_43853965/article/details/103756110)
 
 [XSS ctf 题目](https://juejin.cn/s/ctf%20xss%20%E9%A2%98%E7%9B%AE)
 
