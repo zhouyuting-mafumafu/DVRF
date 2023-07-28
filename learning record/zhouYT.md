@@ -1,5 +1,5 @@
 <div align="center"><h1>Danm Vulnerable Router Firmware</div>
-<p align="center"><img src="./images/brand.png" alt="DVRF" width="300"  /></p>
+<p align="center"><img src="./image/brand.png" alt="DVRF" width="300"  /></p>
 
 # 介绍
 
