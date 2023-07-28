@@ -1,3 +1,39 @@
+<div align="center"><h1>Danm Vulnerable Router Firmware</div>
+<p align="center"><img src="./images/brand.png" alt="DVRF" width="300"  /></p>
+
+# 介绍
+
+DVRF 的全称是 Danm Vulnerable Router Firmware，该项目是一个基于 [OpenWrt](https://openwrt.org/) 改造的漏洞固件。用 CTF 模式来帮助安全专业人员测试物联网设备中常见的漏洞，其中部分漏洞题基于公开的 CVE 漏洞。
+
+| DVRF | 描述 |
+| :--- | :--- |
+| L1 Brute Login |  |
+| L2 Damn XSS |(CVE-2019-18993) |
+| L3 What‘s your bandwidth? | (CVE-2019-12272) |
+| L4 Untar | 
+| L5 Easy serialize 
+| L6 Try Opkg | (CVE-2020-7982) |
+| L7 Baby & Big Pwn | (CVE-2018-1160) |
+
+## L1 Brute Login
+
+本题是进行以下所有解题的一个必要条件，即获得登录密码进入固件后台。由于密码未知，攻击者要熟练掌握burpsuite等工具的使用，以获得解题提示。设计题目时，对密码关键词进行了加密，攻击者需要从提示中尝试各种解密方法来获得有意义的结果从而进行下一步破解。爆破密码的总体思路多样，使用的爆破方式也可以有多种。
+
+## L2 Damn XSS
+
+本题是基于公开漏洞[CVE-2019-18993](https://www.cvedetails.com/cve/CVE-2019-18993/)设计而成，旨在让用户了解相关的**跨站脚本攻击漏洞**。攻击者在成功登陆之后需要找到xss攻击点，绕过我们设置的限制，这需要敏锐找到网页源码中给予的提示，寻找到有效的文本输入框，在进行xss攻击时需要注意过滤一些符号，并触发相关的函数，方能获得下一题的提示。本题解题的总体逻辑不变，绕开的方式有多种，需要攻击者自行尝试。
+
+## L3 What's your bandwidth?
+
+本题是基于公开漏洞 [CVE-2019-12272](https://www.cvedetails.com/cve/CVE-2019-12272/) 设计而成，旨在让用户了解有关 **URL 接口的命令注入漏洞**。该接口可用于获取网卡 eth0 的宽带数据，但是由于处理参数时未检查和处理命令拼接而导致命令注入漏洞。在设计该题目时，为增加题目难度对参数进行一定的过滤，如禁用 `cat`,`less`,`more` 等命令，同时该命令无法直接执行与根目录操作有关的命令，如 `cd /`,`tail /flag` 等命令。本题的解题方法不止一种，对于该命令注入漏洞接口，攻击者可以构造各种各样的 payload 以获取服务器信息。
+
+## L4 Untar
+
+本题旨在让用户了解有关**文件上传的漏洞利用**。该题目设计了上传文件并解压文件到固定目录的功能，在网页端上传选择好的 tar 文件后，服务器就会将上传的文件解压存储在固定目录。由于服务器在解压文件后，未对文件进行检查和处理导致攻击者可以上传木马进行攻击。在设计题目时，对上传的文件进行固定重命名而避免了用户利用文件名进行命令拼接。解题的关键是用户要将木马放在服务器某目录并执行该目录，想要攻击成功攻击者需要了解 openwrt web 端的整体架构与逻辑，主要掌握 lua 语言和 luci 架构。本题的解题方法不止一种，构造怎样的 payload，如何执行木马，木马实现怎样的功能都可以由攻击者设计决定，木马可以简单的执行函数寻找服务器内的 flag 并返回 json 字段在网页端；也可以 socket 连接，让用户直接访问服务器 shell。
+
+## L5 Easy serialize
+
+本题改编自第十六届全国大学生信息安全创新实践能力赛-华北赛区赛题 ez_date 旨在让用户了解有关**反序列化的漏洞利用**。该题目会为用户提供反序列化函数源码及相关会用到函数源码，用户根据源码了解反序列化函数的运行逻辑，自行构造序列化值发送到相应接口获取 flag。在反序列化函数中有有关 md5 值的比较，需要攻击者可以绕开 md5 值比较，使得两个变量值不同但 md5 值相同；除此之外还需要绕过一些过滤规则。
 
 ### 工作内容简介
 
@@ -16,44 +52,9 @@
 * 整体设计以及解题思路
 
     * 用户访问固件登陆界面，密码未知。通过输入任意值，利用burpsuite截获报文，可在请求头中得到一串提示（前缀cuc经过md5加密）：`totallengthis6,f1f4e30acef64bd0d346b050e73289e7`，攻击者后续通过对`f1f4e30acef64bd0d346b050e73289e7`进行MD5解密得到前缀`cuc`，由提示可知是六位密码，随后对后三位利用密码本进行爆破，获得最终密码`cuc123`，成功登录路由器后台。成功登陆后截获的报文中出现flag。
-    * python 解密md5脚本
 
-```python
-import hashlib
-import datetime
-#import sys
-def Findmd5(args):
-    md=args.hashvalue
-    starttime=datetime.datetime.now()
-    for i in open(args.file):
-        md5=hashlib.md5()   #获取一个md5加密算法对象
-        rs=i.strip()    #去掉行尾的换行符
-        md5.update(rs.encode('utf-8'))  #指定需要加密的字符串
-        newmd5=md5.hexdigest()  #获取加密后的16进制字符串
-        #print newmd5
-        if newmd5==md:
-            print '明文是：'+rs    #打印出明文字符串
-            break
-        else:
-            pass
 
-    endtime=datetime.datetime.now()
-    print endtime-starttime	#计算用时，非必须
-
-if __name__=='__main__':
-    import argparse #命令行参数获取模块
-    parser=argparse.ArgumentParser(usage='Usage:./findmd5.py -l 密码文件路径 -i 哈希值 ',description='help info.')   #创建一个新的解析对象
-    parser.add_argument("-l", default='wordlist.txt', help="密码文件.", dest="file")    #向该对象中添加使用到的命令行选项和参数
-    parser.add_argument("-i", dest="hashvalue",help="要解密的哈希值.")
-
-    args = parser.parse_args()  #解析命令行
-    Findmd5(args)
-
-##-l：密码表文件
-##-i：MD5值
-```
-
-* `vim /usr/lib/lua/luci/dispatcher.lua`找到以下位置修改,在报文请求头中添加提示：
+* 设计时在`vim /usr/lib/lua/luci/dispatcher.lua`找到以下位置修改,在报文请求头中添加提示：
 
 ```lua
 if not sid then
@@ -91,58 +92,60 @@ if not sid then
 
 ```
 
-**xss**
+* python 解密md5脚本
 
-* 整体设计思路
+```python
+import hashlib
+import datetime
+#import sys
+def Findmd5(args):
+    md=args.hashvalue
+    starttime=datetime.datetime.now()
+    for i in open(args.file):
+        md5=hashlib.md5()   #获取一个md5加密算法对象
+        rs=i.strip()    #去掉行尾的换行符
+        md5.update(rs.encode('utf-8'))  #指定需要加密的字符串
+        newmd5=md5.hexdigest()  #获取加密后的16进制字符串
+        #print newmd5
+        if newmd5==md:
+            print '明文是：'+rs    #打印出明文字符串
+            break
+        else:
+            pass
 
-    * 攻击者在成功登陆之后需要找到xss攻击点，绕过我们设置的限制，(通过过滤尖括号)，才能获得提示信息。
-    
-    * 攻击者通过查看页面源码，寻找提示，在设计时，为了防止攻击者直接查看源码得到结果，我们将下一题信息写入了一个js文件(showMessage.js)，但是会给出提示信息来提示攻击者利用`showMessage`进行xss攻击尝试。
+    endtime=datetime.datetime.now()
+    print endtime-starttime	#计算用时，非必须
 
-    * 利用导航栏`firewall port-forward` 的 `name` 字段构造 xss，将答案放在`showMessage.js`的函数里，执行这个函数会弹窗给出提示信息
+if __name__=='__main__':
+    import argparse #命令行参数获取模块
+    parser=argparse.ArgumentParser(usage='Usage:./findmd5.py -l 密码文件路径 -i 哈希值 ',description='help info.')   #创建一个新的解析对象
+    parser.add_argument("-l", default='wordlist.txt', help="密码文件.", dest="file")    #向该对象中添加使用到的命令行选项和参数
+    parser.add_argument("-i", dest="hashvalue",help="要解密的哈希值.")
 
-    * 编写js文件并将其放在 `luci-static/resources`目录下，并在`nsection.htm`中加入`<script src="/luci-static/resources/showM.js"></script>`；用户根据藏在界面源码的提示知道需要触发 showMessage函数。
+    args = parser.parse_args()  #解析命令行
+    Findmd5(args)
 
-* 难点
-
-    * 过滤字段，在`forward-details.lua`,对`<xx>`过滤
-
-```lua
-        function escape(input)
-            local stripTagsRE = "</?[^>]+>"
-            local filteredInput = string.gsub(input, stripTagsRE, "")
-            return filteredInput    
-        end
+##-l：密码表文件
+##-i：MD5值
 ```
 
-* 解决方法
+* write up(具体见[Login](https://github.com/zhouyuting-mafumafu/DVRF/tree/record/Login))
 
-    * 输入`<svg onload=showMessage()//`可以绕过
+    * 随意输入密码，burpsuite抓包获得提示
 
-#### 题目一 思路
+    * 确定密码是六位，获得一串密文，猜测MD5加密，进行解密：
 
-* 用户登录需要输入密码，依据这一必要条件设计题目。
+    * 猜测密码`cuc345`，再次抓包，将截获的报文发送至intruder，payload选中`345`，进行爆破：
 
-* 由于密码未知，目的是希望用户通过随意输入密码提交，同时后台进行抓包，用户从报文中获得提示，依据提示解题。
+    * 获得后三位密码
 
-#### 题目一 解题过程(具体见[Login](https://github.com/zhouyuting-mafumafu/DVRF/tree/record/Login))
+    * 登陆成功，此处将会提示下一题的攻击内容：
 
-* 随意输入密码，burpsuite抓包获得提示
+* fix it
 
-* 确定密码是六位，获得一串密文，猜测MD5加密，进行解密：
+    * 防止密码被轻易爆破，建议是使用位数更多，且更加复杂的密码，并且使用sha256加密。
 
-* 猜测密码`cuc345`，再次抓包，将截获的报文发送至intruder，payload选中`345`，进行爆破：
-
-* 获得后三位密码
-
-* 登陆成功，此处将会提示下一题的攻击内容：
-
-#### 题目一 fix it
-
-* 防止密码被轻易爆破，建议是使用位数更多，且更加复杂的密码，并且使用sha256加密。
-
-
-#### 题目一 cheker脚本
+* cheker脚本
 
 ```python
 import requests
@@ -172,34 +175,62 @@ if __name__== "__main__":
     main()
 ```
 
+**xss**
 
-#### 题目二 fix it(writeup见[XSS](https://github.com/zhouyuting-mafumafu/DVRF/tree/record/XSS))
+* 整体设计思路
 
-* `vim usr/model/cbi/firewall/forward-details.lua`
+    * 攻击者在成功登陆之后需要找到xss攻击点，绕过我们设置的限制，(通过过滤尖括号)，才能获得提示信息。
+    
+    * 攻击者通过查看页面源码，寻找提示，在设计时，为了防止攻击者直接查看源码得到结果，我们将下一题信息写入了一个js文件(showMessage.js)，但是会给出提示信息来提示攻击者利用`showMessage`进行xss攻击尝试。
+
+    * 利用导航栏`firewall port-forward` 的 `name` 字段构造 xss，将答案放在`showMessage.js`的函数里，执行这个函数会弹窗给出提示信息
+
+    * 编写js文件并将其放在 `luci-static/resources`目录下，并在`nsection.htm`中加入`<script src="/luci-static/resources/showM.js"></script>`；用户根据藏在界面源码的提示知道需要触发 showMessage函数。
+
+* 难点
+
+    * 过滤字段，在`forward-details.lua`,对`<xx>`过滤
+
 ```lua
-if not name or #name == 0 then
-		name = translate("(Unnamed Entry)")
-	end
-	--m.title = "%s - %s" %{ translate("Firewall - Port Forwards"), name }
-	m.title = "%s - %s" %{ translate("Firewall - Port Forwards"), luci.util.pcdata(name) }
-end
-
-s = m:section(NamedSection, arg[1], "redirect", "")
+        function escape(input)
+            local stripTagsRE = "</?[^>]+>"
+            local filteredInput = string.gsub(input, stripTagsRE, "")
+            return filteredInput    
+        end
 ```
 
-* `vim usr/model/cbi/firewall/rule-details.lua`
+* 解决方法
 
-```lua
-		name = "SNAT %s" % name
-	end
+    * 输入`<svg onload=showMessage()//`可以绕过
 
-	--m.title = "%s - %s" %{ translate("Firewall - Traffic Rules"), name }
-	m.title = "%s - %s" %{ translate("Firewall - Traffic Rules"), luci.util.pcdata(name) }
+* fix it(writeup见[XSS](https://github.com/zhouyuting-mafumafu/DVRF/tree/record/XSS))
 
-	local wan_zone = nil
-```
+    * `vim usr/model/cbi/firewall/forward-details.lua`
 
-#### 题目二 checker脚本
+    ```lua
+    if not name or #name == 0 then
+		    name = translate("(Unnamed Entry)")
+	    end
+	    --m.title = "%s - %s" %{ translate("Firewall - Port Forwards"), name }
+	    m.title = "%s - %s" %{ translate("Firewall - Port Forwards"), luci.util.pcdata(name) }
+    end
+
+    s = m:section(NamedSection, arg[1], "redirect", "")
+    ```
+
+    * `vim usr/model/cbi/firewall/rule-details.lua`
+
+    ```lua
+		    name = "SNAT %s" % name
+	    end
+
+	    --m.title = "%s - %s" %{ translate("Firewall - Traffic Rules"), name }
+	    m.title = "%s - %s" %{ translate("Firewall - Traffic Rules"), luci.util.pcdata(name) }
+
+	    local wan_zone = nil
+    ```
+
+* checker脚本
 
 ```python
 import requests
